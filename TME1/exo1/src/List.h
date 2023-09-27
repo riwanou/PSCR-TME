@@ -35,9 +35,8 @@ public:
 
 	void push_back (const std::string& val) ;
 
-	void push_front (const std::string& val) {
-		tete = new Chainon(val,tete);
-	}
+	// FAUTE: already defined in implementation file (List.cpp)
+	void push_front (const std::string& val);
 
 	bool empty() ;
 

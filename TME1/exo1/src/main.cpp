@@ -6,11 +6,15 @@
 int main () {
 
 	std::string abc = "abc";
-	char * str = new char [3];
+	// part of missing \0
+	char * str = new char [4];
 	str[0] = 'a';
 	str[1] = 'b';
 	str[2] = 'c';
-	size_t i = 0;
+	// FAUTE: missing \0 for strcmp
+	str[3] = '\0';
+	// FAUTE: overflow problem in for loop with size_t, change to int
+	int i = 0;
 
 	if (! strcmp (str, abc.c_str())) {
 		std::cout << "Equal !";
@@ -28,11 +32,13 @@ int main () {
 		std::cout << "elt " << i << ": " << list[i] << std::endl;
 	}
 
+		// FAUTE: delete[] remove all characters in str array
 	// liberer les char de la chaine
-	for (char *cp = str ; *cp ; cp++) {
-		delete cp;
-	}
+	// for (char *cp = str ; *cp ; cp++) {
+		// delete cp;
+	// }
 	// et la chaine elle meme
-	delete str;
+	// FAUTE: array delete need special syntax
+	delete[] str;
 
 }

@@ -1,3 +1,5 @@
+// FAUTE: missing include
+#include "List.h"
 
 namespace pr {
 
@@ -9,15 +11,20 @@ size_t Chainon::length() {
 	if (next != nullptr) {
 		len += next->length();
 	}
-	return length();
+	// FAUTE: causing infinite loop, return len instead
+	return len;
+	// return length();
 }
 
-void Chainon::print (std::ostream & os) {
+// FAUTE: missing const from declaration
+void Chainon::print (std::ostream & os) const {
 	os << data ;
 	if (next != nullptr) {
 		os << ", ";
+		// FAUTE: should not be called if next is nullptr
+		next->print(os);
 	}
-	next->print(os);
+	// next->print(os);
 }
 
 // ******************  List
@@ -45,7 +52,8 @@ void List::push_front (const std::string& val) {
 	tete = new Chainon(val,tete);
 }
 
-bool empty() {
+// FAUTE: missing List::, no access to class definition
+bool List::empty() {
 	return tete == nullptr;
 }
 
@@ -57,8 +65,7 @@ size_t List::size() const {
 	}
 }
 
-} // namespace pr
-
+// FAUTE: should be in namespace
 std::ostream & operator<< (std::ostream & os, const pr::List & vec)
 {
 	os << "[";
@@ -68,4 +75,7 @@ std::ostream & operator<< (std::ostream & os, const pr::List & vec)
 	os << "]";
 	return os;
 }
+
+} // namespace pr
+
 
