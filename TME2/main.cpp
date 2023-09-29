@@ -4,6 +4,8 @@
 #include <chrono>
 #include <set>
 
+#include "hashmap.h"
+
 bool is_new_word(std::vector<std::string>& word_vec, const std::string& word) {
 	for (const auto& w : word_vec) {
 		if (w == word) return false;
@@ -28,6 +30,7 @@ int main () {
 
 	ifstream input = ifstream("../WarAndPeace.txt");
 
+
 	auto start = steady_clock::now();
 	cout << "Parsing War and Peace" << endl;
 
@@ -35,6 +38,8 @@ int main () {
 	size_t unique_words = 0;
 
   vector<pair<string, uint>> word_occurence;
+
+  // HashMap word_hashmap;
 
 	size_t nombre_lu = 0;
 	// prochain mot lu
