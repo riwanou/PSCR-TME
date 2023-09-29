@@ -2,6 +2,7 @@
 #include <fstream>
 #include <regex>
 #include <chrono>
+#include <set>
 
 bool is_new_word(std::vector<std::string>& word_vec, const std::string& word) {
 	for (const auto& w : word_vec) {
@@ -11,7 +12,7 @@ bool is_new_word(std::vector<std::string>& word_vec, const std::string& word) {
 	return true;
 }
 
-void count_occurence(std::vector<std::pair<std::string, int>>& word_occ, const std::string& word) {
+void count_occurence(std::vector<std::pair<std::string, uint>>& word_occ, const std::string& word) {
   for (auto& p : word_occ) {
     if (p.first == word) {
       p.second += 1;
@@ -33,7 +34,7 @@ int main () {
 	vector<string> word_bank;
 	size_t unique_words = 0;
 
-  vector<pair<string, int>> word_occurence;
+  vector<pair<string, uint>> word_occurence;
 
 	size_t nombre_lu = 0;
 	// prochain mot lu
@@ -47,6 +48,7 @@ int main () {
 		transform(word.begin(),word.end(),word.begin(),::tolower);
 
 		if (is_new_word(word_bank, word)) unique_words++;
+    count_occurence(word_occurence, word);
 
 		// word est maintenant "tout propre"
 		if (nombre_lu % 100 == 0)
@@ -66,6 +68,12 @@ int main () {
     cout << "Found a total of " << nombre_lu << " words." << endl;
 
 	cout << "Number of unique words found with vector: " << unique_words << endl;
+
+  for (const auto& p : word_occurence) {
+    if (p.first == "war" || p.first == "peace" || p.first == "toto") {
+      cout << p.first << ": " << p.second << endl;
+    }
+  }
 
     return 0;
 }
