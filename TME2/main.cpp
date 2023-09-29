@@ -3,10 +3,11 @@
 #include <regex>
 #include <chrono>
 
-bool is_new_word(const std::vector<std::string>& word_vec, const std::string& word) {
+bool is_new_word(std::vector<std::string>& word_vec, const std::string& word) {
 	for (const auto& w : word_vec) {
 		if (w == word) return false;
 	}
+  word_vec.push_back(word);
 	return true;
 }
 
@@ -45,7 +46,6 @@ int main () {
 		// passe en lowercase
 		transform(word.begin(),word.end(),word.begin(),::tolower);
 
-		word_bank.push_back(word);
 		if (is_new_word(word_bank, word)) unique_words++;
 
 		// word est maintenant "tout propre"
