@@ -64,5 +64,37 @@ int main() {
     cout << entry.first << ": " << entry.second << endl;
   }
 
+  // inversed index
+  cout << endl;
+  unordered_map<int, forward_list<string>> frequency_words;
+  for (auto entry : words_map) {
+    auto words = forward_list<string>({entry.first});
+    auto it = frequency_words.insert(
+        {entry.second, forward_list<string>{entry.first}});
+    // did not insert, return element
+    if (!it.second) {
+      it.first->second.emplace_front(entry.first);
+    }
+  }
+
+  {
+    int freq = 100;
+    auto words = frequency_words.find(freq)->second;
+    cout << "words with frequency " << freq << ": ";
+    for (const auto &word : words)
+      cout << word << ", ";
+    cout << endl;
+  }
+
+  {
+    int freq = 16709;
+    auto words = frequency_words.find(freq)->second;
+    cout << "words with frequency " << freq << ": ";
+    for (const auto &word : words)
+      cout << word << ", ";
+    cout << endl;
+  }
+
+
   return 0;
 }
