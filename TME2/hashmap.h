@@ -12,7 +12,46 @@ template <typename K, typename V> class HashMap {
   typedef pair<K, V> entry;
 
 public:
+  class iterator {
+  public:
+    iterator(typename vector<forward_list<entry>>::iterator it,
+             typename vector<forward_list<entry>>::iterator end)
+        : vit(it), end(end) {
+      go_next_nonempty();
+    }
+
+    iterator &operator++() {
+      ++lit;
+      if (lit == vit->end()) {
+        ++vit;
+        go_next_nonempty();
+      }
+      return *this;
+    }
+
+    bool operator!=(const iterator &o) {
+      return (vit != o.vit && lit != o.lit);
+    }
+
+    pair<string, int> &operator*() { return *lit; }
+
+  private:
+    typename vector<forward_list<entry>>::iterator vit;
+    typename vector<forward_list<entry>>::iterator end;
+    typename forward_list<entry>::iterator lit;
+
+    void go_next_nonempty() {
+      while (vit->empty() && vit != end) {
+        ++vit;
+      }
+      lit = vit->begin();
+    }
+  };
+
   HashMap(size_t size) { buckets = vector<forward_list<entry>>(size); }
+
+  iterator begin() { return iterator(buckets.begin(), buckets.end()); }
+  iterator end() { return iterator(buckets.end(), buckets.end()); }
 
   V *get(const K &key) {
     int key_index = std::hash<K>()(key) % buckets.size();
@@ -27,6 +66,7 @@ public:
   bool put(const K &key, const V &value) {
     int key_index = hash<K>()(key) % buckets.size();
     forward_list<entry> &bucket = buckets[key_index];
+
     // check if already exist, in this case, modify in place
     for (entry &bucket_value : bucket) {
       if (bucket_value.first == key) {
@@ -54,9 +94,7 @@ public:
     return size;
   }
 
-  const vector<forward_list<entry>>& entries() const {
-    return buckets;
-  }
+  const vector<forward_list<entry>> &entries() const { return buckets; }
 
 private:
   vector<forward_list<entry>> buckets;

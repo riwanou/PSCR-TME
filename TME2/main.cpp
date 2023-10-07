@@ -1,10 +1,13 @@
+#include <cassert>
 #include <chrono>
+#include <forward_list>
 #include <fstream>
 #include <iostream>
 #include <regex>
 #include <set>
 
 #include "hashmap.h"
+#include "iterator.h"
 
 bool is_new_word(std::vector<std::string> &word_vec, const std::string &word) {
   for (const auto &w : word_vec) {
@@ -37,6 +40,7 @@ int main() {
   auto start = steady_clock::now();
   cout << "Parsing War and Peace" << endl;
 
+
   // vector<string> word_bank;
   // size_t unique_words = 0;
   // vector<pair<string, uint>> word_occurence;
@@ -65,7 +69,7 @@ int main() {
 
     // word est maintenant "tout propre"
     if (nombre_lu % 100 == 0)
-    // on affiche un mot "propre" sur 100
+      // on affiche un mot "propre" sur 100
       cout << nombre_lu << ": " << word << "\n";
     nombre_lu++;
   }
@@ -94,20 +98,20 @@ int main() {
 
   cout << "Number of unique words found with hashmap: " << map.size() << endl;
 
-  vector<pair<string, int>> occur_pair(map.size());
-  for (auto bucket : map.entries()) {
-    for (auto value : bucket) {
-      occur_pair.emplace_back(value.first, value.second);
-    }
-  }
+  // vector<pair<string, int>> occur_pair(map.size());
+  // for (auto bucket : map.entries()) {
+  //   for (auto value : bucket) {
+  //     occur_pair.emplace_back(value.first, value.second);
+  //   }
+  // }
 
-  sort(occur_pair.begin(), occur_pair.end(),
-       [](const auto &a, const auto &b) { return a.second > b.second; });
+  // sort(occur_pair.begin(), occur_pair.end(),
+  //      [](const auto &a, const auto &b) { return a.second > b.second; });
 
-  for (int i = 0; i < 10; i++) {
-    auto entry = occur_pair[i];
-    cout << entry.first << ":" << entry.second << endl;
-  }
+  // for (int i = 0; i < 10; i++) {
+  //   auto entry = occur_pair[i];
+  //   cout << entry.first << ":" << entry.second << endl;
+  // }
 
   return 0;
 }
