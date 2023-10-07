@@ -33,7 +33,7 @@ public:
       return (vit != o.vit && lit != o.lit);
     }
 
-    pair<string, int> &operator*() { return *lit; }
+    entry &operator*() { return *lit; }
 
   private:
     typename vector<forward_list<entry>>::iterator vit;

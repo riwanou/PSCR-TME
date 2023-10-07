@@ -34,18 +34,14 @@ int main() {
   using namespace std::chrono;
 
   ifstream input = ifstream("../WarAndPeace.txt");
-
-  HashMap<string, int> map(10);
-
   auto start = steady_clock::now();
   cout << "Parsing War and Peace" << endl;
 
+  HashMap<string, int> map(10);
 
   // vector<string> word_bank;
   // size_t unique_words = 0;
   // vector<pair<string, uint>> word_occurence;
-
-  // HashMap word_hashmap;
 
   size_t nombre_lu = 0;
   // prochain mot lu
@@ -92,26 +88,25 @@ int main() {
   //   }
   // }
 
-  cout << *map.get("war") << endl;
-  cout << *map.get("peace") << endl;
-  cout << (map.get("toto") == nullptr) << endl;
+  // cout << *map.get("war") << endl;
+  // cout << *map.get("peace") << endl;
+  // cout << (map.get("toto") == nullptr) << endl;
 
   cout << "Number of unique words found with hashmap: " << map.size() << endl;
 
-  // vector<pair<string, int>> occur_pair(map.size());
-  // for (auto bucket : map.entries()) {
-  //   for (auto value : bucket) {
-  //     occur_pair.emplace_back(value.first, value.second);
-  //   }
-  // }
+  vector<pair<string, int>> word_vec(map.size());
+  for (auto it = map.begin(); it != map.end(); ++it) {
+    word_vec.push_back(*it);
+  }
 
-  // sort(occur_pair.begin(), occur_pair.end(),
-  //      [](const auto &a, const auto &b) { return a.second > b.second; });
+  sort(word_vec.begin(), word_vec.end(),
+       [](const auto &a, const auto &b) { return a.second > b.second; });
 
-  // for (int i = 0; i < 10; i++) {
-  //   auto entry = occur_pair[i];
-  //   cout << entry.first << ":" << entry.second << endl;
-  // }
+  cout << "\ntop 10 words:" << endl;
+  for (int i = 0; i < 10; i++) {
+    auto entry = word_vec[i];
+    cout << entry.first << ": " << entry.second << endl;
+  }
 
   return 0;
 }
