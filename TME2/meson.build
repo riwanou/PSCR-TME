@@ -4,6 +4,7 @@ inc = ['hashmap.h', 'iterator.h']
 src = []
 
 executable('tme2', 'main.cpp', src, inc)
+executable('tme3', 'main-tme3.cpp', src, inc)
 
 gtest_proj = subproject('gtest')
 gtest_dep = gtest_proj.get_variable('gtest_dep')
