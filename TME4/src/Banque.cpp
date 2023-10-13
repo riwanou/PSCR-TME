@@ -10,7 +10,8 @@ namespace pr {
 void Banque::transfert(size_t deb, size_t cred, unsigned int val) {
   Compte &debiteur = comptes[deb];
   Compte &crediteur = comptes[cred];
-  lock(debiteur.getMutex(), crediteur.getMutex());
+
+  scoped_lock lock(debiteur.getMutex(), crediteur.getMutex());
 
   if (debiteur.debiter(val)) {
     crediteur.crediter(val);

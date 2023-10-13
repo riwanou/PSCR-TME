@@ -15,9 +15,21 @@ credite directement.
 
 ## Question 5
 
-Blocage car on lock 2 fois le meme mutex:
+Interblocage car on lock 2 fois le meme mutex:
 
 - Premier lock sur le compte debiteur
 - Deuxieme lock dans la fonction debiter, sur le meme mutex
 
 ## Question 6
+
+Interblocage car on lock dans 2 ordres inverses:
+
+- Premier couple 10, 15
+- (thread 1) 10 est lock, commutation
+- Deuxieme couple 15, 10
+- (thread 2) 15 est lock
+- (thread 1) essaye d'obtenir 15, lock
+- (thread 2) essaye d'obtenir 10, lock
+
+Pour remedier a ce probleme, utilisation de `scoped_lock` qui ordonne les
+operations lock en fonction de l'addresse des mutex, unlock a la fin du scope.

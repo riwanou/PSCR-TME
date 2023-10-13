@@ -6,7 +6,7 @@
 using namespace std;
 
 const int NB_THREAD = 10;
-const int NB_ACCOUNT = 5;
+const int NB_ACCOUNT = 50;
 
 int main() {
   // random
@@ -15,7 +15,7 @@ int main() {
   vector<thread> threads;
   threads.reserve(NB_THREAD);
 
-  pr::Banque bank(NB_ACCOUNT, 1000000);
+  pr::Banque bank(NB_ACCOUNT, 10000);
 
   for (int a = 0; a < NB_THREAD; a++) {
     threads.emplace_back([&bank, &a]() {
@@ -24,10 +24,8 @@ int main() {
       int j = rand() % NB_ACCOUNT;
       int m = rand() % 100 + 1;
 
-      if (i != j)
-        bank.transfert(i, j, m);
-
       printf("%d -> %d:%d[%d]\n", a, i, j, m);
+      bank.transfert(i, j, m);
 
       // sleep
       int time = rand() % 20;
