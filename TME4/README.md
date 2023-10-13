@@ -4,31 +4,20 @@
 
 [Sujet du TME en PDF](https://pages.lip6.fr/Yann.Thierry-Mieg/PR/tdtme4.pdf)
 
-To use the project :
-*  Go to an empty folder (not your workspace)
-```
-mkdir -p tme4 ; cd tme4 ;
-
-```
-*  Clone the project, 
-```
-git clone https://github.com/yanntm/PSCR-TME4.git
-
-```
-* Reconfigure project.
-This project is compatible with [autoconf/automake](https://www.lrde.epita.fr/~adl/autotools.html), after cloning, use the mantra 
-```
-cd PSCR-TME4
-autoreconf -vfi
-./configure 
-```
-in the root folder to build makefiles for your project.
-* Import in eclipse or open with your favorite editor
-   * For eclipse, `File->Import->General->Existing projects into workspace` and point the folder tme4.
-* To build, simply run `make` in the folder 
-   * For eclipse use the "hammer" tool or "Project->Build Project".
-
-
-Look at the contents of "configure.ac", "Makefile.am" and "src/Makefile.am" which are the input to autotools, and are relatively simple and easy to read.
-
 (c) Sorbonne Université 2018-2019
+
+## Question 2
+
+On a des problemes de undefined behaviour avec datarace car la fonction
+transfert de banque n'est pas atomique. Donc si il y a commutation, on peut
+arriver a un cas ou un compte est debite plusieurs fois et le crediteur pas
+credite directement.
+
+## Question 5
+
+Blocage car on lock 2 fois le meme mutex:
+
+- Premier lock sur le compte debiteur
+- Deuxieme lock dans la fonction debiter, sur le meme mutex
+
+## Question 6

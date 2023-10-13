@@ -90,7 +90,7 @@ int main() {
 
   // cout << *map.get("war") << endl;
   // cout << *map.get("peace") << endl;
-  // cout << (map.get("toto") == nullptr) << endl;
+  cout << (map.get("toto") == nullptr) << endl;
 
   cout << "Number of unique words found with hashmap: " << map.size() << endl;
 
