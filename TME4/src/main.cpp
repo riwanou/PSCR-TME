@@ -5,8 +5,9 @@
 
 using namespace std;
 
-const int NB_THREAD = 10;
-const int NB_ACCOUNT = 50;
+const int NB_THREAD = 20;
+const int NB_ACCOUNT = 100;
+const int ACCOUNT_SOLDE = 234;
 
 int main() {
   // random
@@ -15,7 +16,7 @@ int main() {
   vector<thread> threads;
   threads.reserve(NB_THREAD);
 
-  pr::Banque bank(NB_ACCOUNT, 10000);
+  pr::Banque bank(NB_ACCOUNT, ACCOUNT_SOLDE);
 
   for (int a = 0; a < NB_THREAD; a++) {
     threads.emplace_back([&bank, &a]() {
@@ -26,6 +27,8 @@ int main() {
 
       printf("%d -> %d:%d[%d]\n", a, i, j, m);
       bank.transfert(i, j, m);
+
+      bank.comptabiliser(ACCOUNT_SOLDE * NB_ACCOUNT);
 
       // sleep
       int time = rand() % 20;

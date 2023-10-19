@@ -32,4 +32,10 @@ Interblocage car on lock dans 2 ordres inverses:
 - (thread 2) essaye d'obtenir 10, lock
 
 Pour remedier a ce probleme, utilisation de `scoped_lock` qui ordonne les
-operations lock en fonction de l'addresse des mutex, unlock a la fin du scope.
+operations lock en fonction de l'addresse des mutex (donc on garde toujours le
+meme orde, peut importe i/j) unlock a la fin du scope.
+
+## Question 7
+
+Lorsque le thread comptable est en train de tourner, il est possible qu'en plein
+millieu de la boucle, un transfer ait lieu, ce qui va fausser le resultat final.
