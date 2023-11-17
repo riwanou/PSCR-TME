@@ -6,23 +6,23 @@ namespace pr {
 
 #define STACKSIZE 100
 
-template<typename T>
-class Stack {
-	T tab [STACKSIZE];
-	size_t sz;
-public :
-	Stack () : sz(0) { memset(tab,0,sizeof tab) ;}
+template <typename T> class Stack {
+  T tab[STACKSIZE];
+  size_t sz;
 
-	T pop () {
-		// bloquer si vide
-		T toret = tab[--sz];
-		return toret;
-	}
+public:
+  Stack() : sz(0) { memset(tab, 0, sizeof tab); }
 
-	void push(T elt) {
-		//bloquer si plein
-		tab[sz++] = elt;
-	}
+  T pop() {
+    // bloquer si vide
+    T toret = tab[--sz];
+    return toret;
+  }
+
+  void push(T elt) {
+    // bloquer si plein
+    tab[sz++] = elt;
+  }
 };
 
-}
+} // namespace pr
