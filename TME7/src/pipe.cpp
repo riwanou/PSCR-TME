@@ -44,11 +44,27 @@ int main(int argc, char **argv) {
     execv(argv[1], argv + 1);
   }
 
+  pid = fork();
+  if (pid < 0) {
+    perror("fork 2");
+    exit(1);
+  }
+
+  if (pid == 0) {
+    // child 2
+    close(fd[1]);
+    dup2(fd[0], STDIN_FILENO);
+    pipe_index++;
+    execv(argv[pipe_index], argv + pipe_index);
+  }
+
   // parent
+  close(fd[0]);
   close(fd[1]);
-  dup2(fd[0], STDIN_FILENO);
-  pipe_index++;
-  execv(argv[pipe_index], argv + pipe_index);
+
+  // wait for childs
+  wait(0);
+  wait(0);
 
   return 0;
 }
