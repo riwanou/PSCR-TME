@@ -9,6 +9,11 @@
 #include <dirent.h>
 #include <sys/types.h>
 
+void write_end(int fd) {
+  char end = '0';
+  write(fd, &end, sizeof(char));
+}
+
 class ServerFTP : public pr::ConnectionHandler {
 private:
   std::string directory;
@@ -19,8 +24,10 @@ public:
 
   void handleConnection(pr::Socket socket) {
     int fd = socket.getFD();
+    std::string ack = "ACK";
 
     while (true) {
+      std::cout << "Listening for client request" << std::endl;
       // client request
       int nb = ::read(fd, &buffer[0], buffer.size());
 
@@ -28,6 +35,12 @@ public:
       if (nb == 0) {
         std::cout << "Client connexion end" << std::endl;
         break;
+      }
+
+      // ACK
+      if (write(fd, ack.c_str(), ack.size()) != ack.size()) {
+        perror("Could not write ACK");
+        exit(1);
       }
 
       // handle client request
@@ -45,6 +58,14 @@ public:
     }
   }
 
+  void write_size(int fd, size_t size) {
+    int nb = write(fd, &size, sizeof(size_t));
+    if (nb != sizeof(size_t)) {
+      perror("Could not write size");
+      exit(1);
+    }
+  }
+
   // List files in directory
   void handleList(int fd) {
     std::cout << "RECEIV: action LIST" << std::endl;
@@ -55,12 +76,16 @@ public:
       exit(1);
     }
 
+    size_t dir_size = 0;
     struct dirent *dp;
     std::vector<std::string> entries;
     while ((dp = readdir(dirp)) != NULL) {
       entries.emplace_back(dp->d_name);
+      dir_size += dp->d_namlen;
     }
     closedir(dirp);
+
+    write_size(fd, dir_size);
 
     for (const auto &entry : entries) {
       std::string val = entry + "\n";
