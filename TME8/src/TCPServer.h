@@ -2,6 +2,7 @@
 #define SRC_TCPSERVER_H_
 
 #include "ConnectionHandler.h"
+#include "Pool.h"
 #include "ServerSocket.h"
 #include <thread>
 
@@ -12,8 +13,11 @@ class TCPServer {
   ServerSocket *ss;           // la socket d'attente si elle est instanciee
   ConnectionHandler *handler; // le gestionnaire de session passe a la constru
                               // a completer
+  Pool *pool;
+
 public:
   TCPServer(ConnectionHandler *handler) : ss(nullptr), handler(handler) {}
+  ~TCPServer();
   // Tente de creer une socket d'attente sur le port donné
   bool startServer(short port);
 

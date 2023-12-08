@@ -26,14 +26,7 @@ public:
   void close();
 };
 
-inline std::ostream &operator<<(std::ostream &os, struct sockaddr_in *addr) {
-  char hname[1024];
-  if (!getnameinfo((struct sockaddr *)addr, sizeof *addr, hname, 1024, nullptr,
-                   0, 0)) {
-    os << hname;
-  }
-  return os;
-}
+std::ostream &operator<<(std::ostream &os, struct sockaddr_in *addr);
 
 } // namespace pr
 

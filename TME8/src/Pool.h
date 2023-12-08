@@ -9,7 +9,7 @@
 namespace pr {
 
 // fonction passee a ctor de  thread
-void poolWorker(Queue<Job> *queue) {
+inline void poolWorker(Queue<Job> *queue) {
   while (true) {
     Job *j = queue->pop();
 
