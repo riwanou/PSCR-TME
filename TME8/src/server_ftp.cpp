@@ -1,14 +1,16 @@
-#include "TCPServer.h"
+#include <array>
+#include <dirent.h>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <sys/types.h>
 #include <unistd.h>
 
+#include "TCPServer.h"
 #include "src/ConnectionHandler.h"
 #include "src/Socket.h"
 #include "src/TCPServer.h"
 #include "src/utils_ftp.h"
-#include <array>
-#include <dirent.h>
-#include <sys/types.h>
 
 void write_end(int fd) {
   char end = '0';
@@ -55,7 +57,7 @@ public:
         handleList(fd);
       } else if (action == "UPLOAD") {
         write_ack(fd);
-        handleUpload(fd);
+        handleUpload(fd, arg);
       } else if (action == "DOWNLOAD") {
         write_ack(fd);
         handleDownload(fd);
@@ -65,14 +67,6 @@ public:
         write(fd, &bloup, sizeof(int));
         break;
       }
-    }
-  }
-
-  void write_size(int fd, size_t size) {
-    int nb = write(fd, &size, sizeof(size_t));
-    if (nb != sizeof(size_t)) {
-      perror("Could not write size");
-      exit(1);
     }
   }
 
@@ -95,7 +89,10 @@ public:
     }
     closedir(dirp);
 
-    write_size(fd, dir_size);
+    if (!write_size(fd, dir_size)) {
+      perror("handleList: could not write size");
+      exit(1);
+    }
 
     for (const auto &entry : entries) {
       std::string val = entry + "\n";
@@ -107,7 +104,33 @@ public:
     }
   }
 
-  void handleUpload(int fd) {}
+  void handleUpload(int fd, const std::string &arg) {
+    size_t size = read_size(fd);
+    if (size == 0) {
+      std::cout << "File size of 0 is not supported" << std::endl;
+      return;
+    }
+
+    std::filesystem::path path(arg);
+    std::ofstream file(directory + "/" + path.filename().string());
+    if (!file.is_open()) {
+      std::cout << "Could not create file: " << arg << std::endl;
+      return;
+    }
+
+    int nb = 0;
+    while (nb < size) {
+      nb += ::read(fd, &buffer[0], buffer.size());
+      if (nb == 0) {
+        perror("handleUpload: read client upload");
+        exit(1);
+      }
+      file.write(buffer.cbegin(), nb);
+    }
+
+    std::cout << "Uploaded file: " << arg << ", size: " << size << std::endl;
+  }
+
   void handleDownload(int fd) {}
 
   pr::ConnectionHandler *clone() const { return new ServerFTP(directory); }

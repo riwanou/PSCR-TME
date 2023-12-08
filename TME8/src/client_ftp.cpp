@@ -7,31 +7,44 @@
 #include "Socket.h"
 #include "utils_ftp.h"
 
-size_t read_size(int fd) {
-  size_t size;
-  int nb = read(fd, &size, sizeof(size_t));
-  if (nb != sizeof(size_t))
-    return 0;
-  return size;
-}
-
 void handle_list(int fd, std::array<char, 1024> &buffer) {
   size_t size = read_size(fd);
-  int total_nb = 0;
+  int nb = 0;
 
-  while (total_nb < size) {
-    int nb = read(fd, &buffer[0], buffer.size());
-    total_nb += nb;
-
+  while (nb < size) {
+    nb += read(fd, &buffer[0], buffer.size());
     std::string entry(buffer.cbegin(), nb);
     std::cout << entry;
   }
 }
 
 void handle_upload(int fd, std::array<char, 1024> &buffer, std::string arg) {
-  std::ifstream file(arg);
+  std::ifstream file(arg, std::ifstream::ate | std::ifstream::binary);
+  if (!file.is_open()) {
+    std::cerr << "Could not open " << arg << std::endl;
+    exit(1);
+  }
+
   std::streamsize size = file.tellg();
-  std::cout << "file: " << arg << ", size: " << size << std::endl;
+  if (!write_size(fd, size)) {
+    std::cerr << "Could not write file size" << std::endl;
+    exit(1);
+  }
+
+  file.seekg(0);
+  while (!file.eof()) {
+    file.read(buffer.data(), buffer.size());
+    std::streamsize chunk_size = file.gcount();
+    if (chunk_size == 0) {
+      std::cerr << "Could not upload file, empty chunk" << std::endl;
+      exit(1);
+    }
+
+    if (write(fd, buffer.data(), chunk_size) != chunk_size) {
+      std::cerr << "Error while sending file" << std::endl;
+      exit(1);
+    }
+  }
 }
 
 void handle_download(int fd, std::array<char, 1024> &buffer, std::string arg) {
