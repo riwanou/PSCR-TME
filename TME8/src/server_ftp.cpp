@@ -37,7 +37,9 @@ public:
     int fd = socket.getFD();
 
     while (true) {
+      std::fill(std::begin(buffer), std::end(buffer), 0);
       std::cout << "Listening for client request" << std::endl;
+
       // client request
       int nb = ::read(fd, &buffer[0], buffer.size());
 
@@ -60,7 +62,7 @@ public:
         handleUpload(fd, arg);
       } else if (action == "DOWNLOAD") {
         write_ack(fd);
-        handleDownload(fd);
+        handleDownload(fd, arg);
       } else {
         std::cout << "Failed to recognize client request" << std::endl;
         int bloup = 0;
@@ -105,40 +107,49 @@ public:
   }
 
   void handleUpload(int fd, const std::string &arg) {
-    size_t size = read_size(fd);
-    if (size == 0) {
-      std::cout << "File size of 0 is not supported" << std::endl;
+    std::filesystem::path p(arg);
+    std::string path = directory + "/" + p.filename().string();
+
+    std::string error;
+    if (!receive_file(fd, buffer, path, error)) {
+      std::cerr << "Handle upload error: " << error;
       return;
     }
-
-    std::filesystem::path path(arg);
-    std::ofstream file(directory + "/" + path.filename().string());
-    if (!file.is_open()) {
-      std::cout << "Could not create file: " << arg << std::endl;
-      return;
-    }
-
-    int nb = 0;
-    while (nb < size) {
-      nb += ::read(fd, &buffer[0], buffer.size());
-      if (nb == 0) {
-        perror("handleUpload: read client upload");
-        exit(1);
-      }
-      file.write(buffer.cbegin(), nb);
-    }
-
-    std::cout << "Uploaded file: " << arg << ", size: " << size << std::endl;
   }
 
-  void handleDownload(int fd) {}
+  void handleDownload(int fd, const std::string &arg) {
+    std::string path = directory + "/" + arg;
+
+    std::string error;
+    if (!send_file(fd, buffer, path, error)) {
+      std::cerr << "Upload error: " << error << std::endl;
+      exit(1);
+    }
+  }
 
   pr::ConnectionHandler *clone() const { return new ServerFTP(directory); }
 };
 
-int main() {
-  pr::TCPServer server(new ServerFTP("/tmp"));
-  server.startServer(1668);
+int main(int argc, char **argv) {
+  // parse arguments
+  if (argc < 3) {
+    std::cerr << "Failed to parse arguments, need <port> <directory>"
+              << std::endl;
+    exit(1);
+  }
+
+  short port = std::stoi(argv[1]);
+
+  std::string directory = argv[2];
+  std::ifstream dir(directory);
+  if (!dir.is_open()) {
+    std::cerr << "Directory does not exist" << std::endl;
+    exit(1);
+  }
+
+  // start server
+  pr::TCPServer server(new ServerFTP(directory));
+  server.startServer(port);
   server.stopServer();
   return 0;
 }

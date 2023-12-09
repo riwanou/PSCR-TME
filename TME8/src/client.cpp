@@ -17,6 +17,8 @@ int main00() {
 int main0() {
 
   pr::Socket sock;
+  short port;
+  std::string directory;
 
   sock.connect("localhost", 1664);
 

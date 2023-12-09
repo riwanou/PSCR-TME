@@ -16,44 +16,41 @@ void handle_list(int fd, std::array<char, 1024> &buffer) {
     std::string entry(buffer.cbegin(), nb);
     std::cout << entry;
   }
+
+  std::cout << std::endl;
 }
 
-void handle_upload(int fd, std::array<char, 1024> &buffer, std::string arg) {
-  std::ifstream file(arg, std::ifstream::ate | std::ifstream::binary);
-  if (!file.is_open()) {
-    std::cerr << "Could not open " << arg << std::endl;
+void handle_upload(int fd, std::array<char, 1024> &buffer,
+                   const std::string &arg) {
+  std::string error;
+  if (!send_file(fd, buffer, arg, error)) {
+    std::cerr << "Upload error: " << error << std::endl;
     exit(1);
   }
+}
 
-  std::streamsize size = file.tellg();
-  if (!write_size(fd, size)) {
-    std::cerr << "Could not write file size" << std::endl;
+void handle_download(int fd, std::array<char, 1024> &buffer,
+                     const std::string &arg) {
+  std::string path = "./" + arg;
+
+  std::string error;
+  if (!receive_file(fd, buffer, path, error)) {
+    std::cerr << "Handle download error: " << error;
     exit(1);
   }
+}
 
-  file.seekg(0);
-  while (!file.eof()) {
-    file.read(buffer.data(), buffer.size());
-    std::streamsize chunk_size = file.gcount();
-    if (chunk_size == 0) {
-      std::cerr << "Could not upload file, empty chunk" << std::endl;
-      exit(1);
-    }
-
-    if (write(fd, buffer.data(), chunk_size) != chunk_size) {
-      std::cerr << "Error while sending file" << std::endl;
-      exit(1);
-    }
+int main(int argc, char **argv) {
+  // parse arguments
+  if (argc < 2) {
+    std::cerr << "Failed to parse arguments, need <port>" << std::endl;
+    exit(1);
   }
-}
+  short port = std::stoi(argv[1]);
 
-void handle_download(int fd, std::array<char, 1024> &buffer, std::string arg) {
-  std::cout << "ARG: " << arg << std::endl;
-}
-
-int main() {
+  // connect
   pr::Socket sock;
-  sock.connect("localhost", 1668);
+  sock.connect("localhost", port);
   if (!sock.isOpen()) {
     perror("Failed to connect to server");
     exit(1);
@@ -63,6 +60,8 @@ int main() {
   std::array<char, 1024> buffer;
 
   while (true) {
+    std::fill(std::begin(buffer), std::end(buffer), 0);
+
     // parse request
     std::string input, action, arg;
     std::getline(std::cin, input);
