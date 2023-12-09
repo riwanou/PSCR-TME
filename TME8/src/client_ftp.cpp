@@ -9,10 +9,11 @@
 
 void handle_list(int fd, std::array<char, 1024> &buffer) {
   size_t size = read_size(fd);
-  int nb = 0;
+  int total_nb = 0;
 
-  while (nb < size) {
-    nb += read(fd, &buffer[0], buffer.size());
+  while (total_nb < size) {
+    int nb = read(fd, &buffer[0], buffer.size());
+    total_nb += nb;
     std::string entry(buffer.cbegin(), nb);
     std::cout << entry;
   }

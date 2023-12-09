@@ -86,8 +86,13 @@ public:
     struct dirent *dp;
     std::vector<std::string> entries;
     while ((dp = readdir(dirp)) != NULL) {
-      entries.emplace_back(dp->d_name);
-      dir_size += dp->d_namlen;
+      if (dp->d_type == DT_DIR) {
+        entries.emplace_back("> " + std::string(dp->d_name));
+        dir_size += dp->d_namlen + 2;
+      } else {
+        entries.emplace_back(dp->d_name);
+        dir_size += dp->d_namlen;
+      }
     }
     closedir(dirp);
 
